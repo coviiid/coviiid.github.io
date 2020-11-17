@@ -1,0 +1,23 @@
+<h2><a id="user-content-graphes-" class="anchor" aria-hidden="true" href="#graphes-"></a>graphes :</h2>
+<p>données hospitalières quotidiennes, par département du patient :<br>
+nombre quotidien de nouveaux décès et de nouvelles admissions en réanimation.</p>
+<ul>
+<li>
+<p><code>réa</code> et <code>dc</code> : moyennes 7 jours glissants (jours précedents)</p>
+</li>
+<li>
+<p><code>ligne grise</code> : 50% de la mortalité quotidienne toutes causes, <br>
+pour le département ou la zone (insee données 2018+2019, moyenne par mois)</p>
+</li>
+<li>
+<p><code>lignes vertes</code> : regressions «linéaires» sur les tronçons de réa, <br>
+les billes vertes donnent le temps de doublement</p>
+</li>
+<li>
+<p><code>tronçons rouges</code> : « prédictor » = courbe réa décalée de x jours, <br>
+légèrement écrasée (facteur <a href="https://github.com/ofa-/predictor/blob/master/predictor.py#L111-L114">0.885</a>)</p>
+</li>
+</ul>
+<p>données : Santé Publique France &gt;
+<a href="https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/" rel="nofollow">data.gouv.fr</a> &gt;
+<a href="https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c30c" rel="nofollow">nouveaux-covid19.csv</a></p>
