@@ -1,4 +1,17 @@
-all: xkcd.ttf clean
+all:
+
+setup:
+	sudo apt-get install -y python3 language-pack-fr
+	pip3 install -r requirements.txt
+
+check:
+	./predictor.py --help
+	:
+	tail -1 data.csv
+	:
+	./predictor.py --noshow 38
+	ls -lh 38.png
+
 
 FONT = Yahfie/Yahfie-Heavy.ttf
 ZIPFILE = Yahfie-Normal.font.zip
@@ -12,7 +25,7 @@ xkcd.ttf: fontname.py ~/.fonts
 	rm -f $(ZIPFILE)
 
 fontname.py:
-	pip install fonttools
+	pip3 install fonttools
 	wget https://github.com/chrissimpkins/fontname.py/raw/master/fontname.py
 	chmod +x fontname.py
 
@@ -53,6 +66,12 @@ help.fr:
 
 fetch:
 	./fetch.sh
+
+wait-for-data.csv:
+	while [ `tail -1 data.csv | cut -d ';' -f2` != `date +%F` ]; do \
+		sleep 1m	;\
+		./fetch.sh	;\
+	done
 
 upload:
 	lftp -c "open $(TARGET); mput *.png"

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -96,7 +96,7 @@ def fill(line, **kwargs):
 
 
 def add_note(plot, x, data, text, side=True):
-    plot.annotate(text, color="grey", size="x-small", alpha=0.3,
+    plot.annotate(text, color="#AAA", size="x-small",
                     xy=(x+pd.Timedelta(days=1), data[x]))
 
 
@@ -122,7 +122,7 @@ def regressor(data):
                 [207,215],
                 [216,229],
                 [230,237],
-                [238,len(data)],
+                [240,len(data)],
             ]
 
     reg_line = pd.concat([
@@ -245,7 +245,7 @@ def show_dbl(plot, reg_line, chunks):
 
 def text_xy(point, nb_days):
     a = np.log(2)/nb_days
-    d = 1.1
+    d = 1.1 if nb_days > 0 else 1.2
     dy = d/np.sqrt(1 + a**2)
     dx = d/np.sqrt(1 + 1/a**2)
     return (
@@ -428,7 +428,7 @@ def pretty_time(val):
 def init():
     from os import path, system
     if not path.exists("data.csv"):
-        system("fetch.sh")
+        system("./fetch.sh")
 
     global dep
     dep = pd.read_csv("dep.csv", sep="\t")
