@@ -64,6 +64,26 @@ help.fr:
 	| sed 's:<svg.*</svg>::g' \
 	> help.fr.md.html
 
+
+figures = fig s01 s02 full
+figures: $(figures:%=figs.%)
+
+figs.fig: options = --two-months
+figs.s01: options = --episode-1
+figs.s02: options =
+figs.full: options = --full
+
+figs.%:
+	for dept in `seq 95 | sed '/^.$$/ s/^/0/'` \
+			met pc gc idf 2A 2B ; \
+	do \
+		$(graphit) $$dept --noshow $(options) & \
+	done; \
+	wait ; \
+	mkdir -p $* ;\
+	mv *.png $* ;\
+	git add -f $*/*.png
+
 fetch:
 	./fetch.sh
 
@@ -79,6 +99,5 @@ upload:
 push:
 	git config user.name coviiid
 	git config user.email coviiid@github.users
-	mv *.png fig
-	git commit -m "add `date +%F` graphs" fig
+	git commit -m "add `date +%F` graphs"
 	git push origin HEAD:master

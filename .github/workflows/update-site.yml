@@ -18,5 +18,5 @@ jobs:
 
       - run: make check
 
-      - run: make curfew
+      - run: make figures
       - run: make push
