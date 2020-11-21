@@ -75,3 +75,10 @@ wait-for-data.csv:
 
 upload:
 	lftp -c "open $(TARGET); mput *.png"
+
+push:
+	git config user.name coviiid
+	git config user.email coviiid@github.users
+	mv *.png fig
+	git commit -m "add `date +%F` graphs" fig
+	git push origin HEAD:master
