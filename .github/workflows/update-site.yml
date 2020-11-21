@@ -18,5 +18,6 @@ jobs:
 
       - run: make check
 
+      - run: make wait-for-data.csv
       - run: make figures
       - run: make push
