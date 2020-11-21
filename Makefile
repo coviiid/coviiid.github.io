@@ -65,7 +65,7 @@ help.fr:
 	> help.fr.md.html
 
 
-figures = fig s01 s02 full
+figures = fig s02 full
 figures: $(figures:%=figs.%)
 
 figs.fig: options = --two-months
