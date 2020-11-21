@@ -12,8 +12,15 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - run: make setup xkcd.ttf help.fr
 
       - run: make check fetch curfew
+
+      - run: |
+             git config user.name coviiid
+             git config user.email coviiid@github.users
+             mv *.png fig
+             git commit -m "add `date +%F` graphs" fig
+             git push origin HEAD:master
