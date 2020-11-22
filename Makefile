@@ -77,7 +77,7 @@ figs.%:
 	for dept in `seq 95 | sed '/^.$$/ s/^/0/'` \
 			met pc gc idf 2A 2B ; \
 	do \
-		$(graphit) $$dept --noshow $(options) & \
+		$(graphit) $$dept --noshow --noise $(options) & \
 	done; \
 	wait ; \
 	mkdir -p $* ;\
