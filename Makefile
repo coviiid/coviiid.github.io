@@ -83,6 +83,13 @@ figs.%:
 	mv *.png $* ;\
 	git add -f $*/*.png
 
+figures: met-full
+
+%-full:
+	$(graphit) $* --full
+	mv  $@.png full/
+	git add -f full/$@.png
+
 fetch:
 	./fetch.sh
 
