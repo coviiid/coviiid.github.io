@@ -44,10 +44,9 @@ depts = \
 nonoise = \
 		05 04
 
-graphit = ./predictor.py --round
+graphit = ./predictor.py --noshow --round
 
 curfew:
-	unset DISPLAY; \
 	for dept in $(nonoise); do \
 		$(graphit) $$dept --two-months & \
 	done; \
@@ -77,7 +76,7 @@ figs.%:
 	for dept in `seq 95 | sed '/^.$$/ s/^/0/'` \
 			met pc gc idf 2A 2B ; \
 	do \
-		$(graphit) $$dept --noshow --noise $(options) & \
+		$(graphit) $$dept --noise $(options) & \
 	done; \
 	wait ; \
 	mkdir -p $* ;\
