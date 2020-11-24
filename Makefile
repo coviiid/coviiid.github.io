@@ -73,7 +73,7 @@ figs.s02: options =
 figs.full: options = --full
 
 figs.%:
-	for dept in `seq 95 | sed '/^.$$/ s/^/0/'` \
+	for dept in `seq 95 | grep -v 20 | sed '/^.$$/ s/^/0/'` \
 			met pc gc idf 2A 2B ; \
 	do \
 		$(graphit) $$dept --noise $(options) & \
