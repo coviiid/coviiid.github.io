@@ -57,6 +57,18 @@ def main():
         incid['pred'] = None
         pred = cuts = []
 
+#    # xkcd style ignores alpha spec on lines ? draw them outside
+#    with plt.style.context(opt.style) if opt.style else plt.xkcd():
+#        plot = incid.plot(logy=True, y=["incid_rea", "incid_dc"])
+#
+#    def plot_alpha(data, color):
+#        data.plot(alpha=0.5, linewidth=2, color=color)
+#    plot_alpha(incid.reg, "darkgreen")
+#    plot_alpha(incid.pred, "darkred") if len(pred) else None
+#
+#    with plt.style.context(opt.style) if opt.style else plt.xkcd():
+#
+
     with plt.style.context(opt.style) if opt.style else plt.xkcd():
         plot = incid.plot(logy=True)
         show_dbl(plot, reg_line, chunks)
@@ -134,6 +146,7 @@ def regressor(data):
 
 def predictor(data):
     scaled = 10**0.2 * data['incid_rea'].pow(0.885)
+    scale2 = 10**0.31 * data['incid_rea'].pow(0.885)
 
     shifts = [
                 [ [0,20], 5 ],
@@ -150,16 +163,23 @@ def predictor(data):
                 [ [207,213], 8 ],
                 [ [219,225], 4 ],
                 [ [230,231], 0 ],
-                #[ [228,len(scaled)], 1 ],
+                [ [237,len(scaled)], 5 ],
             ]
 
-    shifted = pd.concat([
-        scaled[range(*chunk[0])] .shift(periods=chunk[1], freq='D')
-            for chunk in shifts
-        ]) \
+    shifted = pd.concat(
+        shift(scaled, shifts[0:14]) +
+        shift(scale2, shifts[14:])
+        ) \
         .rename('pred')
 
     return shifted, shifts
+
+
+def shift(scaled, shifts):
+    return [
+        scaled[range(*chunk[0])] .shift(periods=chunk[1], freq='D')
+        for chunk in shifts
+    ]
 
 
 def avg_dc_line(region):
@@ -168,7 +188,8 @@ def avg_dc_line(region):
     sel = dc_j.depdom.str.match(region) if region != "met" else \
          ~dc_j.depdom.str.match("9[7-9]|na")
 
-    dc = dc_j[sel].groupby(['ADEC', 'MDEC', 'JDEC']).dc_j.sum()
+    dc_ = dc_j[sel].groupby(['ADEC', 'MDEC', 'JDEC']).dc_j.sum()
+    dc  = dc_[2018].append(dc_[2019])
     avg = dc.groupby('MDEC').mean()
     std = dc.groupby('MDEC').std()
 
