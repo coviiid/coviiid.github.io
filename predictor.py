@@ -52,8 +52,7 @@ def main():
             .join(reg_line) \
             .join(pred, how='outer')
 
-    if opt.pred: pass
-    elif opt.nopred or arg != "met":
+    if not opt.pred:
         incid['pred'] = None
         pred = cuts = []
 
@@ -70,7 +69,7 @@ def main():
 #
 
     with plt.style.context(opt.style) if opt.style else plt.xkcd():
-        plot = incid.plot(logy=True)
+        plot = incid.plot(logy=opt.log_scale)
         show_dbl(plot, reg_line, chunks)
         annotate(plot, pred, cuts)
 
@@ -163,7 +162,9 @@ def predictor(data):
                 [ [207,213], 8 ],
                 [ [219,225], 4 ],
                 [ [230,231], 0 ],
-                [ [237,len(scaled)], 6 ],
+                [ [238,245], 6 ],
+                [ [252,253], 0 ],
+                #[ [246,len(scaled)], 10 ],
             ]
 
     shifted = pd.concat(
@@ -318,15 +319,19 @@ def set_view(plot, arg, gap):
         zoom_1_100(plot, arg)
 
     if opt.full:
-        fig_xsize = 16 * ( (now - date("2020-03-20")).days /
+        fig_xsize = 12 * ( (now - date("2020-03-20")).days /
             (date("2020-10-20") - date("2020-03-20")).days )
+        margin_left = .05
         plot.figure.set(figwidth=fig_xsize, figheight=6)
         plot.set(xlim=("2020-03-20", now+td(days=gap)))
+        plot.figure.subplots_adjust(left=margin_left, right=1-margin_left)
         zoom_full_adaptive(plot, arg)
 
 
 def zoom_full_adaptive(plot, arg):
-    yscale = pd.Series([0.8, 64])
+    yscale = pd.Series(
+            [0.8, 64] if opt.log_scale else
+            [0.2, 32])
 
     factor = 30 if arg == "met" else \
               7 if arg == "idf" else \
@@ -348,7 +353,9 @@ def zoom_1_10_adaptive(plot, arg):
 
 
 def zoom_1_50_adaptive(plot, arg):
-    yscale = pd.Series([0.8, 64])
+    yscale = pd.Series(
+            [0.8, 64] if opt.log_scale else
+            [0.2, 32])
 
     factor = 30 if arg == "met" else \
               4 if arg == "idf" else \
@@ -477,13 +484,13 @@ def parse_args():
     parser.add_argument("--fouché", action="store_true",
             help="graph Fouché-fixed réa (5/8)")
     parser.add_argument("--pred", action="store_true",
-            help="graph predictor anyway [normaly only for met]")
-    parser.add_argument("--nopred", action="store_true",
-            help="don't show predictor graph")
+            help="graph predictor")
     parser.add_argument("--noise", action="store_true",
             help="show mortality noise level")
     parser.add_argument("--round", action="store_true",
             help="show rounded values graphs")
+    parser.add_argument("--log-scale", action="store_true",
+            help="use logarithmic y-scale for graphs")
     parser.add_argument("--style", action="store",
             choices=plt.style.available, metavar='<style>',
             help="use <style> instead of xkcd [try: fast]")
