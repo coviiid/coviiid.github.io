@@ -38,7 +38,8 @@ def main():
 
     sums = selection.groupby('jour').sum()
 
-    data = sums.rolling(7).mean()
+    data = sums.rolling(7).mean() \
+    #            .rolling(3, win_type="hamming").mean()
 
     dc_ref, dc_noise = avg_dc_line(region)
     reg_line, chunks = regressor(data)
@@ -48,8 +49,19 @@ def main():
     if opt.round:
         incid = incid.round()
 
+    reg_dc_chunks = [
+            [25,25+7],
+            [33,33+15],
+            [245,len(incid)],
+        ]
+    reg_dc_line = pd.concat([
+        exp_lin_reg(data.incid_dc[range(*chunk)])
+            for chunk in reg_dc_chunks
+    ]).rename("reg.dc")
+
     incid = incid \
             .join(reg_line) \
+            .join(reg_dc_line) \
             .join(pred, how='outer')
 
     if not opt.pred:
@@ -71,6 +83,7 @@ def main():
     with plt.style.context(opt.style) if opt.style else plt.xkcd():
         plot = incid.plot(logy=opt.log_scale)
         show_dbl(plot, reg_line, chunks)
+        show_dbl(plot, reg_dc_line, reg_dc_chunks, color="red", above=True)
         annotate(plot, pred, cuts)
 
         avg_dc_percent = 50
@@ -89,7 +102,7 @@ def main():
         sums.incid_dc.plot     (alpha=.3, color="orange", zorder=-1,
                                 marker="+", linestyle="")
 
-        set_opts(plot)
+        set_opts(plot, arg)
         set_view(plot, arg, gap = cuts[-1][1] if cuts else 0)
         set_title(plot, arg, double_times(data, chunks[-2:]))
 
@@ -133,7 +146,7 @@ def regressor(data):
                 [207,215],
                 [216,229],
                 [230,237],
-                [240,len(data)],
+                [245,len(data)],
             ]
 
     reg_line = pd.concat([
@@ -245,7 +258,7 @@ def _annotate(plot, point, nb_days, side):
     )
 
 
-def show_dbl(plot, reg_line, chunks):
+def show_dbl(plot, reg_line, chunks, color="green", above=False):
     size = [ len(range(*chunk)) for chunk in chunks ]
     spots = [ int(size[i]/2) + sum(size[:i]) for i in range(len(size)) ]
     for spot in spots:
@@ -256,18 +269,18 @@ def show_dbl(plot, reg_line, chunks):
         plot.annotate(
             f'{abs(round(nb_days))}',
             fontsize="x-small",
-            color="green",
-            bbox=dict(boxstyle="circle", color="green", alpha=.2),
-            xy=text_xy(point, nb_days),
+            color=color,
+            bbox=dict(boxstyle="circle", color=color, alpha=.2),
+            xy=text_xy(point, nb_days, above),
             path_effects=[
                 patheffects.withStroke(linewidth=4, foreground="w"),
             ]
         )
 
 
-def text_xy(point, nb_days):
+def text_xy(point, nb_days, above):
     a = np.log(2)/nb_days
-    d = 1.1 if nb_days > 0 else 1.2
+    d = 1.1 if nb_days > 0 or above else 1.2
     dy = d/np.sqrt(1 + a**2)
     dx = d/np.sqrt(1 + 1/a**2)
     return (
@@ -276,11 +289,14 @@ def text_xy(point, nb_days):
     )
 
 
-def set_opts(plot):
+def set_opts(plot, arg):
     log_scalator = [1,2,3,4,5,7,10,20,30,50,70,100,200,300,500,900,1500]
+    lin_scalator = [1,5,10,20,30,50,100,200,300,500,900,1500]
+    if arg == "met": lin_scalator = lin_scalator[5:]
+    scalator = log_scalator if opt.log_scale else lin_scalator
     int_formatter = lambda x, pos: f'{x:.0f}'
-    plot.axes.yaxis.set_minor_locator(plt.FixedLocator(log_scalator))
-    plot.axes.yaxis.set_major_locator(plt.FixedLocator(log_scalator))
+    plot.axes.yaxis.set_minor_locator(plt.FixedLocator(scalator))
+    plot.axes.yaxis.set_major_locator(plt.FixedLocator(scalator))
     plot.axes.yaxis.set_minor_formatter(int_formatter)
     plot.axes.yaxis.set_major_formatter(int_formatter)
     plot.axes.xaxis.set_major_formatter(DateFormatter('\xAF\n%b'))
