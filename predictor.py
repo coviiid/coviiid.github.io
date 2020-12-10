@@ -17,9 +17,12 @@ regions = {
         "gc":  [ "Grande Couronne", "77|78|91|95" ],
         "idf": [ "Île de France", "75|91|92|93|94|95|77|78" ],
         "sud": [ "13|30|34|83" ],
-        "ra":  [ "69|38|01|26" ],
+        "ra":  [ "Rhône-Alpes", "69|38|01|26|73|74" ],
+        "auv": [ "Auvergne", "03|07|15|42|43|63" ],
+        "ara": [ "Auvergne Rhône-Alpes", "69|38|01|26|73|74|03|07|15|42|43|63" ],
         "brg": [ "Bourgogne Franche-Comté", "21|25|39|58|70|71|89|90" ],
         "fc":  [ "Franche-Comté", "25|39|70|90" ],
+        "ge":  [ "Grand Est", "08|10|51|52|54|55|57|67|68|88" ],
         "met": [ "Métropole", "met" ],
 }
 
@@ -52,7 +55,8 @@ def main():
     reg_dc_chunks = [
             [25,25+7],
             [33,33+15],
-            [245,len(incid)],
+            [245,245+14],
+            [260,len(incid)],
         ]
     reg_dc_line = pd.concat([
         exp_lin_reg(data.incid_dc[range(*chunk)])
@@ -348,22 +352,24 @@ def set_view(plot, arg, gap):
 def zoom_full_adaptive(plot, arg):
     yscale = pd.Series(
             [0.8, 64] if opt.log_scale else
-            [0.2, 32])
+            [0, 32])
 
     factor = 30 if arg == "met" else \
               7 if arg == "idf" else \
-              4 if arg in [ "pc", "gc" ] else \
+              4 if arg in regions else \
               1
 
     plot.set(ylim=(yscale * factor).values)
 
 
 def zoom_1_10_adaptive(plot, arg):
-    yscale = pd.Series([0.4, 16])
+    yscale = pd.Series(
+            [0.4, 16] if opt.log_scale else
+            [0, 8])
 
     factor = 21 if arg == "met" else \
               8 if arg == "idf" else \
-              4 if arg in [ "gc", "pc" ] else \
+              4 if arg in regions else \
               1
 
     plot.set(ylim=(yscale * factor).values)
@@ -372,18 +378,20 @@ def zoom_1_10_adaptive(plot, arg):
 def zoom_1_50_adaptive(plot, arg):
     yscale = pd.Series(
             [0.8, 64] if opt.log_scale else
-            [0.2, 32])
+            [0, 32])
 
     factor = 30 if arg == "met" else \
               4 if arg == "idf" else \
-              2 if arg in [ "pc", "gc" ] else \
+              2 if arg in regions else \
               1
 
     plot.set(ylim=(yscale * factor).values)
 
 
 def zoom_1_100(plot, arg):
-    yscale = pd.Series([0.8, 128])
+    yscale = pd.Series(
+            [0.8, 128] if opt.log_scale else
+            [0, 64])
 
     factor = 7.15 if arg == "met" else \
              1
