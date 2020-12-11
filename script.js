@@ -1,19 +1,24 @@
 var _region = {
-	"survey": "13,34,30,31,33,69,42,38,73,74,05,67,76,59,75,pc,gc,idf,met",
+	"radar": "13,34,30,31,33,69,42,38,73,74,05,67,76,59,75,pc,gc,idf,met",
 	"paca": "04,05,06,13,83,84",
-	"rhone-alpes": "69,38,01,26,73,74",
-	"auvergne": "03,07,15,42,43,63",
+	"rhone-alpes": "69,42,07,01,26,38,73,74",
+	"auvergne": "03,15,43,63",
 	"bretagne": "22,29,35,56",
 	"normandie": "14,27,50,61,76",
-	"aquitaine": "16,17,19,23,24,33,40,47,64,79,86,87",
+	"limousin": "19,23,87",
+	"aquitaine": "24,33,40,47,64",
+	"poitou-charentes": "16,17,79,86",
+	"nouvelle-aquitaine": "16,17,19,23,24,33,40,47,64,79,86,87",
+	"midi-pyrenees": "09,12,31,32,46,65,81,82",
+	"languedoc-roussillon": "11,30,34,48,66",
 	"occitanie": "09,11,12,30,31,32,34,46,48,65,66,81,82",
 	"grand-est": "08,10,51,52,54,55,57,67,68,88",
-	"centre-loire": "18,28,36,37,41,45",
-	"pays-loire": "44,49,53,72,85",
+	"centre-val-de-loire": "18,28,36,37,41,45",
+	"pays-de-la-loire": "44,49,53,72,85",
 	"bourgogne": "21,58,71,89",
 	"franche-comte": "25,39,70,90",
-	"hauts-france": "02,59,60,62,80",
-	"ile-de-france": "75,77,78,91,92,93,94,95",
+	"hauts-de-france": "02,59,60,62,80",
+	"ile-de-france": "75,77,78,91,92,93,94,95,pc,gc,idf",
 	"sud": "34,30,13,83,06,2A,2B",
 }
 
@@ -35,6 +40,7 @@ function onload() {
 	set_loop(document.images)
 	add_img_areas()
 	add_home_img()
+	add_regions()
 	add_help()
 
 	document.onkeydown = onkeypress
@@ -46,6 +52,11 @@ function onload() {
 }
 
 function show_query(query) {
+	if (query in _region) {
+		show(document.images[0])
+		toggle_regions()
+		return
+	}
 	query = query.split(",")[0] + ".png"
 
 	var images = document.images
@@ -59,7 +70,7 @@ function show_query(query) {
 }
 
 function get_region(query) {
-	var region = _region[query || "survey"]
+	var region = _region[query || "radar"]
 	return region ? region : region_of_dep(query)
 }
 
@@ -96,11 +107,50 @@ function add_home_img() {
 	document.images.curr = home
 }
 
+function add_regions() {
+	var regions = document.createElement("div")
+	regions.setAttribute("class", "buttons")
+	regions.style.display = "none"
+
+	for (var r in _region) {
+		var butt = document.createElement("div")
+		butt.innerHTML = r
+		butt.onclick = region_button_onclick
+		butt.id = r
+		regions.appendChild(butt)
+	}
+
+	var icon = document.createElement("div")
+	icon.setAttribute("class", "icon")
+	icon.innerHTML = "R"
+
+	var container = document.createElement("div")
+	container.setAttribute("class", "regions")
+	container.appendChild(regions)
+	container.appendChild(icon)
+	regions.onclick = icon.onclick = toggle_regions
+
+	document.body.appendChild(container)
+}
+
+function region_button_onclick(ev) {
+	ev.stopPropagation()
+	document.location.replace(
+		document.location.pathname + "?" + this.id
+	)
+}
+
+function toggle_regions() {
+	var style = document.querySelector(".regions .buttons").style
+	style.display = (style.display ? "" : "none")
+}
+
 function add_help() {
 	var help = document.createElement("div")
+	help.setAttribute("class", "help")
 	help.innerHTML = (
-	'<img class="help icon" src="img/help_icon.png">' +
-	'<p class="help text" style="display:none">' +
+	'<div class="icon">?</div>' +
+	'<p class="text" style="display:none">' +
 	'<iframe src="help.fr.md.html" onload="move_to_parent(this)"/>' +
 	'</p>'
 	)
@@ -111,7 +161,7 @@ function add_help() {
 }
 
 function toggle_help() {
-	var style = document.querySelector(".help.text").style
+	var style = document.querySelector(".help .text").style
 	style.display = (style.display ? "" : "none")
 }
 
@@ -165,6 +215,8 @@ function onkeypress(ev) {
 		case 37: show_prev(); break;
 		case 39: show_next(); break;
 		case 27: show_home(); break;
+		case 188:
 		case 72: return toggle_help()
+		case 82: return toggle_regions()
 	}
 }
