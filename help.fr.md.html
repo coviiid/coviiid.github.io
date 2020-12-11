@@ -10,12 +10,11 @@ nombre quotidien de nouveaux décès et de nouvelles admissions en réanimation.
 pour le département ou la zone (insee données 2018+2019, moyenne par mois)</p>
 </li>
 <li>
-<p><code>lignes vertes</code> : regressions «linéaires» sur les tronçons de réa, <br>
+<p><code>lignes vertes</code> : regressions exponentielles sur les tronçons de réa, <br>
 les billes vertes donnent le temps de doublement</p>
 </li>
 <li>
-<p><code>tronçons rouges</code> : « prédictor » = courbe réa décalée de x jours, <br>
-légèrement écrasée (facteur <a href="https://github.com/ofa-/predictor/blob/master/predictor.py#L111-L114">0.885</a>)</p>
+<p><code>tronçons rouges</code> : regressions exponentielles sur dc</p>
 </li>
 </ul>
 <p>données : Santé Publique France &gt;
