@@ -3,6 +3,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import locale; locale.setlocale(locale.LC_ALL, "fr_FR.UTF8")
+
 
 def by_death_location():
     dc = load_data()
@@ -60,7 +62,45 @@ def plot_age_split(_met):
         },
     )
     index = pd.date_range(freq='D', start="2020-01-01", periods=len(y))
-    y.set_index(index).plot(); plt.show()
+    y = y.set_index(index)
+    p = y.plot(alpha=0.5, linewidth=.7)
+
+    for _sel in sel:
+      for year in [2018, 2019]:
+        ref = baseline(_sel[year])
+        color = 'grey'
+        p.plot(ref._avg, color=color, linestyle=':', linewidth=.7)
+        p.axes.fill_between(ref.index, ref._avg-ref._std, ref._avg+ref._std, alpha=0.07, color=color)
+
+    avg = y.rolling(7, center=True).mean()
+    std = y.rolling(7, center=True).std()
+
+    for i, c in enumerate(y.columns):
+        _avg, _std = avg[c], std[c]
+        color = p.lines[i].get_color()
+        p.plot(_avg, color=color, alpha=0.8)
+        p.axes.fill_between(y.index, _avg-_std, _avg+_std, alpha=0.3, color=color)
+
+    for handle in p.legend_.legendHandles:
+        handle.set_linewidth(3)
+
+    p.figure.set(figheight=7, figwidth=16)
+    p.set_title("Décès quotidiens toutes causes par tranche d'age\n" +
+                "Données INSEE : 2020 (couleur), 2018 et 2019 (gris)",
+                fontsize='medium', horizontalalignment='left',
+                bbox={'facecolor':'white', 'alpha':.2, 'boxstyle':'round,pad=.4'},
+                x=.695, y=.92, transform=p.transAxes)
+
+    plt.show()
+
+
+def baseline(sel):
+    index = pd.date_range(freq='D', start="2020-01-01", periods=59).append(
+            pd.date_range(freq='D', start="2020-03-01", periods=len(sel)-59))
+    data = sel.reset_index().ANAIS.rolling(7, center=True)
+    return pd.DataFrame(
+            { "_avg": data.mean(), "_std": data.std() }
+    ).set_index(index)
 
 
 def main():
@@ -69,8 +109,8 @@ def main():
     met, eld, _met = overview_year_compare()
 
     #plot_years(met)
-    #plot_age_split(_met)
-    plot_age_split(_met[_met.depdom.str.match("59")])
+    plot_age_split(_met)
+    #plot_age_split(_met[_met.depdom.str.match("59")])
 
 
 main()
