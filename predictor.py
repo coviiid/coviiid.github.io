@@ -78,7 +78,7 @@ def main():
     with plt.style.context(opt.style) if opt.style else plt.xkcd():
         plot = incid.plot(logy=opt.log_scale)
         show_dbl(plot, reg_line, chunks)
-        show_dbl(plot, reg_dc_line, reg_dc_chunks, color="red", above=True)
+        show_dbl(plot, reg_dc_line, reg_dc_chunks, color="red")
         annotate(plot, pred, cuts)
 
         avg_dc_percent = 50
@@ -163,7 +163,8 @@ def reg_dc(data):
             [250,250+8],
             [263,263+6],
             [270,270+8],
-            [281,len(data)],
+            [282,282+5],
+            [288,len(data)],
         ]
     # adjust indexes for centered window (-3 days)
     reg_dc_chunks = [ [x[0]-3,x[1]-3] for x in reg_dc_chunks ]
