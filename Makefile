@@ -46,7 +46,7 @@ nonoise = \
 
 graphit = ./predictor.py --noshow --round
 
-curfew:
+radar:
 	for dept in $(nonoise); do \
 		$(graphit) $$dept --two-months & \
 	done; \
@@ -107,3 +107,19 @@ push:
 	git config user.email coviiid@github.users
 	git commit -m "add `date +%F` graphs"
 	git push origin HEAD:master
+
+insee.diff:
+	diff -ru insee_dc.2020-12-18 insee_dc.2021-01-08 |\
+	egrep '^\+' | sed '1d' |\
+	cut -c 1-8 | uniq -c
+
+insee.fetch: release = 2021-01-08
+insee.fetch:
+	wget https://www.insee.fr/fr/statistiques/fichier/4487988/$(release)_detail.zip
+	mkdir insee_dc.$(release)
+	cd insee_dc.$(release); unzip ../$(release)_detail.zip
+	rm -f $(release)_detail.zip
+	ln -sfT insee_dc.$(release) insee_dc
+
+insee.stat:
+	./insee_dc.py
