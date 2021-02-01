@@ -122,4 +122,4 @@ insee.fetch:
 	ln -sfT insee_dc.$(release) insee_dc
 
 insee.stat:
-	./insee_dc.py
+	./insee_dc.py --noise --raw
