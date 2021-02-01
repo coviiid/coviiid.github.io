@@ -39,7 +39,7 @@ clean:
 
 depts = \
 		31 34 13 42 69 38 76 75 59 \
-		33 67 30 73 74 50 \
+		33 67 30 73 74 50 06 35 \
 		idf pc gc met
 nonoise = \
 		05 04
@@ -109,11 +109,11 @@ push:
 	git push origin HEAD:master
 
 insee.diff:
-	diff -ru insee_dc.2021-01-08 insee_dc.2021-01-15 |\
+	diff -ru insee_dc.2021-01-15 insee_dc.2021-01-29 |\
 	egrep '^\+' | sed '1d' |\
 	cut -c 1-8 | uniq -c
 
-insee.fetch: release = 2021-01-15
+insee.fetch: release = 2021-01-29
 insee.fetch:
 	wget https://www.insee.fr/fr/statistiques/fichier/4487988/$(release)_detail.zip
 	mkdir insee_dc.$(release)
