@@ -5,7 +5,7 @@ on:
     tags:
       - '*'
   schedule:
-      - cron: "0 18 * * *"
+      - cron: "0 16 * * *"
 
 jobs:
   publish-site:
