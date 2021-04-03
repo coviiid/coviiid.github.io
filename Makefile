@@ -109,17 +109,19 @@ push:
 	git push origin HEAD:master
 
 insee.diff:
-	diff -ru insee_dc.2021-01-15 insee_dc.2021-01-29 |\
+	diff -ru insee_dc.2021-03-19 insee_dc.2021-04-02 |\
 	egrep '^\+' | sed '1d' |\
 	cut -c 1-8 | uniq -c
 
-insee.fetch: release = 2021-01-29
+insee.fetch: release = 2021-04-02
 insee.fetch:
 	wget https://www.insee.fr/fr/statistiques/fichier/4487988/$(release)_detail.zip
 	mkdir insee_dc.$(release)
 	cd insee_dc.$(release); unzip ../$(release)_detail.zip
 	rm -f $(release)_detail.zip
 	ln -sfT insee_dc.$(release) insee_dc
+	[ -f insee_dc/DC_20202021_det.csv ] && \
+		mv insee_dc/DC_20202021_det.csv insee_dc/DC_2020_det.csv
 
 insee.stat:
 	./insee_dc.py --noise --raw
