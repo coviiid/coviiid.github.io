@@ -81,7 +81,7 @@ def main():
         show_dbl(plot, reg_dc_line, reg_dc_chunks, color="red")
         annotate(plot, pred, cuts)
 
-        avg_dc_percent = 50
+        avg_dc_percent = 25
         avg_dc = plot_avg_dc(plot, dc_ref, avg_dc_percent)
         if opt.round:
             dc_noise = dc_noise.round()
@@ -92,10 +92,10 @@ def main():
             (data.incid_rea * 5/8).rename('Fouché-fix réa') \
                     .plot(linestyle="--", linewidth=.7, color="#00D")
 
-        # light => alpha area: .05, markers: .25
-        fill(sums.incid_dc,     alpha=.1, color="orange", zorder=-1)
-        sums.incid_dc.plot     (alpha=.3, color="orange", zorder=-1,
-                                marker="+", linestyle="")
+        if opt.hills:
+            plot_hills(plot, sums.incid_dc, color="orange", zorder=-1)
+        else:
+            plot_bars(plot, sums.incid_dc, alpha=.04, color="orange", zorder=-1)
 
         set_opts(plot, arg)
         set_view(plot, arg, gap = cuts[-1][1] if cuts else 0)
@@ -117,6 +117,17 @@ def fill(line, **kwargs):
 def add_note(plot, x, data, text, side=True):
     plot.annotate(text, color="#AAA", size="x-small",
                     xy=(x+pd.Timedelta(days=1), data[x]))
+
+
+def plot_bars(plot, data, **kwargs):
+    for width in [1, .3]:
+        plot.bar(data.index, data, sketch_params=0, width=width, **kwargs)
+
+
+def plot_hills(plot, data, **kwargs):
+        # light => alpha area: .05, markers: .25
+        fill(data,  alpha=.1, **kwargs)
+        data.plot  (alpha=.3, **kwargs, marker="+", linestyle="")
 
 
 def plot_avg_dc(plot, dc_ref, dc_percent):
@@ -154,7 +165,7 @@ def regressor(data):
                 [357,len(data)],
             ]
 
-    chunks = [ [x[0]-3, x[1]-3] for x in chunks ]
+    chunks = fix_indexes_for_centered_window(chunks)
 
     reg_line = pd.concat([
         exp_lin_reg(reg_data[range(*chunk)])
@@ -165,8 +176,10 @@ def regressor(data):
 
 def reg_dc(data):
     reg_dc_chunks = [
-            [25,25+7],
-            [33,33+15],
+            [6,6+9],
+            [33,33+14],
+            [61,61+51],
+            [203,203+28],
             [250,250+8],
             [263,263+6],
             [270,270+8],
@@ -178,10 +191,11 @@ def reg_dc(data):
             [323,323+8],
             [332,332+12],
             [345,345+5],
-            [351,len(data)],
+            [351,351+24],
+            [378,len(data)],
         ]
-    # adjust indexes for centered window (-3 days)
-    reg_dc_chunks = [ [x[0]-3,x[1]-3] for x in reg_dc_chunks ]
+
+    reg_dc_chunks = fix_indexes_for_centered_window(reg_dc_chunks)
 
     reg_dc_line = pd.concat([
         exp_lin_reg(data.incid_dc[range(*chunk)])
@@ -231,6 +245,11 @@ def shift(scaled, shifts):
         scaled[range(*chunk[0])] .shift(periods=chunk[1], freq='D')
         for chunk in shifts
     ]
+
+
+def fix_indexes_for_centered_window(chunks):
+    # centered 7-day window => shift index -3 days
+    return [ [x[0]-3, x[1]-3] for x in chunks ]
 
 
 def avg_dc_line(region):
@@ -547,6 +566,8 @@ def parse_args():
             help="show mortality noise level")
     parser.add_argument("--round", action="store_true",
             help="show rounded values graphs")
+    parser.add_argument("--hills", action="store_true",
+            help="show dc as hills instead of bars")
     parser.add_argument("--log-scale", action="store_true",
             help="use logarithmic y-scale for graphs")
     parser.add_argument("--style", action="store",
