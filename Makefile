@@ -99,19 +99,19 @@ wait-for-data.csv:
 		./fetch.sh	;\
 	done
 
-upload:
-	lftp -c "open $(TARGET); mput *.png"
-
 push:
 	git config user.name coviiid
 	git config user.email coviiid@github.users
 	git commit -m "add `date +%F` graphs"
 	git push origin HEAD:master
 
-insee.%: release = 2021-04-09
+upload:
+	lftp -c "open $(TARGET); mput *.png"
+
+insee.%: release = 2021-04-16
 
 insee.diff:
-	diff -ru insee_dc.2021-04-02 insee_dc.$(release) |\
+	diff -ru insee_dc.2021-04-09 insee_dc.$(release) |\
 	egrep '^\+' | sed '1d' |\
 	cut -c 1-8 | uniq -c
 
