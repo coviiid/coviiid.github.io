@@ -39,11 +39,11 @@ Usage
 =====
 
 ```
-$ ./predictor.py -h
-usage: predictor.py [-h] [--zoom-1-100] [--two-months] [--full] [--episode-1]
-                    [--fouché] [--pred] [--noise] [--round] [--hills]
-                    [--log-scale] [--style <style>] [--noshow]
-                    arg [arg ...]
+$ ./graphit.py -h
+usage: graphit.py [-h] [--zoom-1-100] [--two-months] [--full] [--episode-1]
+                  [--fouché] [--pred] [--noise] [--round] [--week] [--hills]
+                  [--log-scale] [--style <style>] [--noshow]
+                  arg [arg ...]
 
 positional arguments:
   arg              dept [dept ...] or region
@@ -59,6 +59,7 @@ optional arguments:
   --pred           graph predictor
   --noise          show mortality noise level
   --round          show rounded values graphs
+  --week           show weekly average graph
   --hills          show dc as hills instead of bars
   --log-scale      use logarithmic y-scale for graphs
   --style <style>  use <style> instead of xkcd [try: fast]
@@ -83,20 +84,20 @@ Running
 
 ```
 ./fetch.sh
-./predictor.py
+./graphit.py
 ```
 
 ```
-./predictor.py idf
-./predictor.py 13
-./predictor.py 69 38
+./graphit.py idf
+./graphit.py 13
+./graphit.py 69 38
 ```
 
 ```
-./predictor.py met --full
-./predictor.py met --two-months --noise
-./predictor.py met --episode-1
-./predictor.py met --style seaborn
+./graphit.py met --full
+./graphit.py met --two-months --noise
+./graphit.py met --episode-1
+./graphit.py met --style seaborn
 ```
 
 
