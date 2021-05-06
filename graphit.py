@@ -204,7 +204,7 @@ def reg_dc(data):
             [378,378+10],
             [389,389+7],
             [398,398+7],
-            [406,len(data)],
+            [409,len(data)],
         ]
 
     reg_dc_chunks = fix_indexes_for_centered_window(reg_dc_chunks)
@@ -469,7 +469,7 @@ def exp_lin_reg(reg_data):
 
 def slope(reg_data):
     line, slope = _exp_lin_reg(reg_data)
-    return slope
+    return slope if slope != 0 else 10**-9
 
 
 def _exp_lin_reg(reg_data):
