@@ -46,12 +46,13 @@ nonoise = \
 
 graphit = ./graphit.py --noshow --round --week
 
+radar: opts = --two-months
 radar:
 	for dept in $(nonoise); do \
-		$(graphit) $$dept --two-months & \
+		$(graphit) $$dept $(opts) & \
 	done; \
 	for dept in $(depts); do \
-		$(graphit) $$dept --two-months --noise & \
+		$(graphit) $$dept $(opts) --noise & \
 	done; \
 	$(graphit) met --full & \
 	wait
@@ -108,10 +109,10 @@ push:
 upload:
 	lftp -c "open $(TARGET); mput *.png"
 
-insee.%: release = 2021-04-30
+insee.%: release = 2021-05-07
 
 insee.diff:
-	diff -ru insee_dc.2021-04-23 insee_dc.$(release) |\
+	diff -ru insee_dc.2021-04-30 insee_dc.$(release) |\
 	egrep '^\+' | sed '1d' |\
 	cut -c 1-8 | uniq -c
 
