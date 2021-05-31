@@ -46,7 +46,7 @@ def main():
     #            .rolling(3, win_type="hamming").mean()
 
     dc_ref, dc_noise = avg_dc_line(region)
-    reg_line, chunks = regressor(data)
+    reg_line, chunks = reg_rea(data)
     pred, cuts = predictor(data)
     reg_dc_line, reg_dc_chunks = reg_dc(data)
 
@@ -148,7 +148,7 @@ def plot_weekly_avg(data, **kwargs):
     w_avg.plot(drawstyle='steps', linewidth=.5, **kwargs)
 
 
-def regressor(data):
+def reg_rea(data):
     reg_data = data['incid_rea']
 
     chunks = [
@@ -175,8 +175,7 @@ def regressor(data):
                 [357,365],
                 [366,382],
                 [385,403],
-                [404,413],
-                [414,421],
+                [404,421],
                 [422,len(data)],
             ]
 
@@ -207,11 +206,8 @@ def reg_dc(data):
             [332,332+12],
             [345,345+5],
             [351,351+24],
-            [378,378+10],
-            [389,389+7],
-            [398,398+7],
-            [409,409+6],
-            [419,len(data)],
+            [378,378+30],
+            [409,len(data)],
         ]
 
     reg_dc_chunks = fix_indexes_for_centered_window(reg_dc_chunks)
