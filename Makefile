@@ -76,10 +76,11 @@ figs.full: options = --full
 
 figs.%:
 	for dept in `seq 95 | grep -v 20 | sed '/^.$$/ s/^/0/'` \
-			met pc gc idf 2A 2B ; \
+			pc gc idf 2A 2B ; \
 	do \
 		$(graphit) $$dept --noise $(options) & \
 	done; \
+	$(graphit) met --zoom 150 --noise $(options) & \
 	wait ; \
 	mkdir -p $* ;\
 	mv *.png $* ;\
