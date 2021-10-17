@@ -180,7 +180,8 @@ def reg_rea(data):
                 [477,507],
                 [509,522],
                 [523,541],
-                [542,len(data)],
+                [542,567],
+                [568,len(data)],
             ]
 
     chunks = fix_indexes_for_centered_window(chunks)
@@ -214,7 +215,8 @@ def reg_dc(data):
             [409,486],
             [487,520],
             [521,539],
-            [540,len(data)],
+            [540,572],
+            [573,len(data)],
         ]
 
     reg_dc_chunks = fix_indexes_for_centered_window(reg_dc_chunks)
@@ -413,6 +415,9 @@ def set_view(plot, arg, gap):
     if opt.zoom_1_100:
         zoom_1_100(plot, arg)
 
+    if opt.zoom:
+        plot.set(ylim=(0, opt.zoom))
+
     if opt.full:
         fig_xsize = 12 * ( (now - date("2020-03-20")).days /
             (date("2020-10-20") - date("2020-03-20")).days )
@@ -574,6 +579,9 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument("--zoom-1-100", action="store_true",
             help="graph using 1-100 y scale [default is 1-50]")
+    parser.add_argument("--zoom", action="store",
+            type=int, metavar='<max-y>',
+            help="graph using 1-<max-y> for y-scale")
     parser.add_argument("--two-months", action="store_true",
             help="graph last two months")
     parser.add_argument("--full", action="store_true",
