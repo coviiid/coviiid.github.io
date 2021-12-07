@@ -80,7 +80,7 @@ figs.%:
 	do \
 		$(graphit) $$dept --noise $(options) & \
 	done; \
-	$(graphit) met --zoom 150 --noise $(options) & \
+	$(graphit) met --zoom 350 --noise $(options) & \
 	wait ; \
 	mkdir -p $* ;\
 	mv *.png $* ;\
