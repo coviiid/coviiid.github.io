@@ -111,7 +111,7 @@ push:
 upload:
 	lftp -c "open $(TARGET); mput *.png"
 
-insee.%: release = 2021-05-21
+insee.%: release = 2021-12-10
 
 insee.diff:
 	diff -ru insee_dc.2021-05-07 insee_dc.$(release) |\
@@ -119,6 +119,7 @@ insee.diff:
 	cut -c 1-8 | uniq -c
 
 insee.fetch:
+	: home: https://www.insee.fr/fr/statistiques/4487988
 	wget $(insee.url)/$(release)_detail.zip
 	mkdir insee_dc.$(release)
 	cd insee_dc.$(release); unzip ../$(release)_detail.zip
