@@ -108,13 +108,21 @@ push:
 	git commit -m "add `date +%F` graphs"
 	git push origin HEAD:master
 
-upload:
-	lftp -c "open $(TARGET); mput *.png"
 
-insee.%: release = 2021-12-10
+day.dc:
+day.dc: day = $(shell tail -1 data.csv | cut -d\; -f2)
+
+%.dc:
+	grep $(day) data.csv | grep -v '"97' \
+			| cut -f5 -d\; | xargs | tr ' ' + | bc
+
+%.dc: day = $*
+
+
+insee.%: release = 2021-12-17
 
 insee.diff:
-	diff -ru insee_dc.2021-05-07 insee_dc.$(release) |\
+	diff -ru insee_dc.2021-12-10 insee_dc.$(release) |\
 	egrep '^\+' | sed '1d' |\
 	cut -c 1-8 | uniq -c
 

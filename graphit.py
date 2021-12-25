@@ -46,9 +46,12 @@ def main():
     #            .rolling(3, win_type="hamming").mean()
 
     dc_ref, dc_noise = avg_dc_line(region)
-    reg_line, chunks = reg_rea(data)
+    reg_line, reg_rea_chunks = reg_rea(data)
     pred, cuts = predictor(data)
     reg_dc_line, reg_dc_chunks = reg_dc(data)
+
+    pred_dc = mk_pred(data.incid_dc, reg_dc_chunks[-1])
+    pred_rea = mk_pred(data.incid_rea, reg_rea_chunks[-1])
 
     incid = data[["incid_rea", "incid_dc"]]
     if opt.round:
@@ -77,7 +80,7 @@ def main():
 
     with plt.style.context(opt.style) if opt.style else plt.xkcd():
         plot = incid.plot(logy=opt.log_scale)
-        show_dbl(plot, reg_line, chunks)
+        show_dbl(plot, reg_line, reg_rea_chunks, color="green")
         show_dbl(plot, reg_dc_line, reg_dc_chunks, color="red")
         annotate(plot, pred, cuts)
 
@@ -85,12 +88,16 @@ def main():
         avg_dc = plot_avg_dc(plot, dc_ref, avg_dc_percent)
         if opt.round:
             dc_noise = dc_noise.round()
-        dc_noise.plot(linestyle=":", linewidth=.5, color="grey", zorder=0) \
-                    if opt.noise else None
+        if opt.noise:
+            dc_noise.plot(linestyle=":", linewidth=.5, color="grey", zorder=0)
 
         if opt.fouché:
             (data.incid_rea * 5/8).rename('Fouché-fix réa') \
                     .plot(linestyle="--", linewidth=.7, color="#00D")
+
+        if True:
+            pred_dc.plot(linestyle=":", linewidth=.9, color="red")
+            pred_rea.plot(linestyle=":", linewidth=.9, color="green")
 
         if opt.hills:
             plot_hills(plot, sums.incid_dc, color="orange", zorder=-1)
@@ -102,7 +109,7 @@ def main():
 
         set_opts(plot, arg)
         set_view(plot, arg, gap = cuts[-1][1] if cuts else 0)
-        set_title(plot, arg, double_times(data, chunks[-2:]))
+        set_title(plot, arg, double_times(data, reg_rea_chunks[-2:]))
 
         x = pd.Timestamp(plot.axes.get_xlim()[0], unit="D")
         add_note(plot, x, avg_dc, f"{avg_dc_percent}%")
@@ -161,8 +168,6 @@ def complement_week_from_last_one(data):
 
 
 def reg_rea(data):
-    reg_data = data['incid_rea']
-
     chunks = [
                 [9,14],
                 [19,28],
@@ -199,11 +204,16 @@ def reg_rea(data):
                 [633,len(data)],
             ]
 
+    return mk_reg(data.incid_rea, chunks)
+
+
+def mk_reg(reg_data, chunks):
     chunks = fix_indexes_for_centered_window(chunks)
 
     reg_line = pd.concat([
         exp_lin_reg(reg_data[range(*chunk)])
-            for chunk in chunks ])
+            for chunk in chunks ]) \
+        .rename(reg_data.name + ".reg")
 
     return reg_line, chunks
 
@@ -236,14 +246,7 @@ def reg_dc(data):
             [634,len(data)],
         ]
 
-    reg_dc_chunks = fix_indexes_for_centered_window(reg_dc_chunks)
-
-    reg_dc_line = pd.concat([
-        exp_lin_reg(data.incid_dc[range(*chunk)])
-            for chunk in reg_dc_chunks
-    ]).rename("reg.dc")
-
-    return reg_dc_line, reg_dc_chunks
+    return mk_reg(data.incid_dc, reg_dc_chunks)
 
 
 def predictor(data):
@@ -495,9 +498,14 @@ def zoom_1_100(plot, arg):
     plot.set(ylim=(yscale * factor).values)
 
 
+def mk_pred(data, chunk):
+    line, slope = _exp_lin_reg(data[range(*chunk)])
+    return line[-8:]
+
+
 def exp_lin_reg(reg_data):
     line, slope = _exp_lin_reg(reg_data)
-    return line
+    return line[:-7]
 
 def slope(reg_data):
     line, slope = _exp_lin_reg(reg_data)
@@ -511,10 +519,13 @@ def _exp_lin_reg(reg_data):
     reg = LinearRegression()
     reg.fit(X, Y.fillna(0))
 
-    reg_line = reg.predict(X.astype('float64'))
+    next_week = pd.date_range(reg_data.index.values[-1], freq='D', periods=8)[1:]
+    index = reg_data.index.append(next_week)
+
+    reg_line = reg.predict(index.values.reshape(-1,1).astype('float64'))
     slope = reg_line[1]-reg_line[0]
 
-    return pd.Series(index=Y.index, data=reg_line) \
+    return pd.Series(index=index, data=reg_line) \
                 .rename('reg') \
                 .apply(np.exp) \
             , slope
