@@ -44,7 +44,7 @@ depts = \
 nonoise = \
 		05 04
 
-graphit = ./graphit.py --noshow --round --week
+graphit = ./graphit.py --noshow --round --week --style fast
 
 radar: opts = --two-months
 radar:
