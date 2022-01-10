@@ -201,7 +201,8 @@ def reg_rea(data):
                 [568,580],
                 [582,604],
                 [605,631],
-                [633,len(data)],
+                [633,653],
+                [654,len(data)],
             ]
 
     return mk_reg(data.incid_rea, chunks)
@@ -420,11 +421,11 @@ def set_view(plot, arg, gap):
     if opt.episode_1:
         now = date("2020-03-22") + td(days=64 if opt.two_months else 35)
 
-    plot.set(xlim=(now-td(days=33), now+td(days=2)))
+    plot.set(xlim=(now-td(days=33), now+td(days=opt.proj-5)))
     zoom_1_50_adaptive(plot, arg)
 
 
-    if arg == "met": # add room for predictor, keep xscale 35d
+    if arg == "met" and opt.pred: # add room for predictor, keep xscale 35d
         plot.set( xlim=(now-td(days=35-gap), now+td(days=gap)))
 
     if opt.two_months:
@@ -500,12 +501,12 @@ def zoom_1_100(plot, arg):
 
 def mk_pred(data, chunk):
     line, slope = _exp_lin_reg(data[range(*chunk)])
-    return line[-8:]
+    return line[-opt.proj-1:]
 
 
 def exp_lin_reg(reg_data):
     line, slope = _exp_lin_reg(reg_data)
-    return line[:-7]
+    return line[:-opt.proj]
 
 def slope(reg_data):
     line, slope = _exp_lin_reg(reg_data)
@@ -519,8 +520,10 @@ def _exp_lin_reg(reg_data):
     reg = LinearRegression()
     reg.fit(X, Y.fillna(0))
 
-    next_week = pd.date_range(reg_data.index.values[-1], freq='D', periods=8)[1:]
-    index = reg_data.index.append(next_week)
+    pred_chunk = pd.date_range(
+            reg_data.index.values[-1], freq='D', periods=opt.proj+1)[1:]
+
+    index = reg_data.index.append(pred_chunk)
 
     reg_line = reg.predict(index.values.reshape(-1,1).astype('float64'))
     slope = reg_line[1]-reg_line[0]
@@ -618,6 +621,9 @@ def parse_args():
             help="graph Episode I time window")
     parser.add_argument("--fouché", action="store_true",
             help="graph Fouché-fixed réa (5/8)")
+    parser.add_argument("--proj", action="store",
+            type=int, metavar='<nb-days>', default=7,
+            help="show <nb-days> of projection for regressors")
     parser.add_argument("--pred", action="store_true",
             help="graph predictor")
     parser.add_argument("--noise", action="store_true",
