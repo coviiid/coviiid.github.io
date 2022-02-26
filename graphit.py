@@ -116,7 +116,31 @@ def main():
         add_note(plot, x, dc_noise, f"bruit") \
                 if opt.noise else None
 
+        if opt.proj_val:
+            add_yaxis_note(plot, pred_dc, 'red')
+            add_yaxis_note(plot, pred_rea, 'green')
+
         plot.figure.savefig(arg + ("-full" if opt.full else ""))
+
+
+def add_yaxis_note(plot, data, color, side=False):
+    x = pd.Timestamp(plot.axes.get_xlim()[1], unit="D")
+    y = data[str(x.date())]
+    point = [x, y]
+    text = round(y)
+    offset = 15
+    plot.annotate(
+        text,
+        xy=point,
+        fontsize="x-small",
+        bbox=dict(boxstyle="round4", fc="w", color=color),
+        arrowprops=dict(arrowstyle="-|>", lw=.7,
+            connectionstyle="arc3,rad="+("" if side else "+")+"0.2", fc="w"),
+        xytext=(
+            point[0] - pd.Timedelta(days=3),
+            point[1] + (offset if side else -offset) # logscale => offset via * or /
+        )
+    )
 
 
 def fill(line, **kwargs):
@@ -206,7 +230,8 @@ def reg_rea(data):
                 [663,672],
                 [673,679],
                 [680,688],
-                [689,len(data)],
+                [689,702],
+                [703,len(data)],
             ]
 
     return mk_reg(data.incid_rea, chunks)
@@ -252,7 +277,8 @@ def reg_dc(data):
             [660,672],
             [673,679],
             [680,690],
-            [693,len(data)],
+            [693,704],
+            [705,len(data)],
         ]
 
     return mk_reg(data.incid_dc, reg_dc_chunks)
@@ -429,7 +455,8 @@ def set_view(plot, arg, gap):
     if opt.episode_1:
         now = date("2020-03-22") + td(days=64 if opt.two_months else 35)
 
-    plot.set(xlim=(now-td(days=33), now+td(days=opt.proj-5)))
+    proj_gap = opt.proj-5
+    plot.set(xlim=(now-td(days=35-proj_gap), now+td(days=proj_gap)))
     zoom_1_50_adaptive(plot, arg)
 
 
@@ -632,6 +659,8 @@ def parse_args():
     parser.add_argument("--proj", action="store",
             type=int, metavar='<nb-days>', default=7,
             help="show <nb-days> of projection for regressors")
+    parser.add_argument("--proj-val", action="store_true",
+            help="show projections values on right y-axis")
     parser.add_argument("--pred", action="store_true",
             help="graph predictor")
     parser.add_argument("--noise", action="store_true",
