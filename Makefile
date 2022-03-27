@@ -119,7 +119,11 @@ day.dc: day = $(shell tail -1 data.csv | cut -d\; -f2)
 %.dc: day = $*
 
 
-insee.%: release = 2022-02-25
+toll:
+	./waves-toll.py
+
+
+insee.%: release = 2022-03-25
 
 insee.diff: prev_rel = $(shell ls | grep insee_dc.20 | sort -r | sed -n 2p)
 insee.diff:
@@ -127,7 +131,7 @@ insee.diff:
 	egrep '^\+' | sed '1d' |\
 	cut -c 1-8 | uniq -c
 
-insee.fetch: csv_file = $(release)_detail_2022.zip
+insee.fetch: csv_file = $(release)_detail.zip
 insee.fetch:
 	: home: https://www.insee.fr/fr/statistiques/4487988
 	wget $(insee.url)/$(csv_file)
@@ -141,4 +145,4 @@ insee.fetch:
 insee.url = https://www.insee.fr/fr/statistiques/fichier/4487988
 
 insee.stat:
-	./insee_dc.py --baseline-noise
+	./insee_dc.py --baseline-noise --age-split

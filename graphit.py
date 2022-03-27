@@ -283,8 +283,8 @@ def reg_dc(data):
             [693,704],
             [706,715],
             [716,723],
-            [724,732],
-            [733,len(data)],
+            [724,733],
+            [734,len(data)],
         ]
 
     return mk_reg(data.incid_dc, reg_dc_chunks)
@@ -348,7 +348,7 @@ def avg_dc_line(region):
     avg = dc.groupby('MDEC').mean()
     std = dc.groupby('MDEC').std()
 
-    dates = pd.date_range("2020-03-01", "2022-04-01")
+    dates = pd.date_range("2020-03-01", "2024-04-01")
     avg_dc = [ avg[month]/100 for month in dates.month ]
     noise =  [ std[month] for month in dates.month ]
 
