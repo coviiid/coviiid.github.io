@@ -69,9 +69,9 @@ help.fr:
 figures = fig s02
 figures: $(figures:%=figs.%)
 
-figs.fig: options = --two-months
+figs.fig: options = --two-months --proj-val
 figs.s01: options = --episode-1
-figs.s02: options =
+figs.s02: options = --proj-val
 figs.full: options = --full
 
 figs.%:
