@@ -69,10 +69,12 @@ help.fr:
 figures = fig s02
 figures: $(figures:%=figs.%)
 
-figs.fig: options = --two-months --proj-val
+figs.fig: options = --two-months
 figs.s01: options = --episode-1
-figs.s02: options = --proj-val
+figs.s02: options =
 figs.full: options = --full
+
+figs.fig: met.opt = --zoom 350 --proj-val
 
 figs.%:
 	for dept in `seq 95 | grep -v 20 | sed '/^.$$/ s/^/0/'` \
@@ -80,7 +82,7 @@ figs.%:
 	do \
 		$(graphit) $$dept --noise $(options) & \
 	done; \
-	$(graphit) met --zoom 350 --noise $(options) & \
+	$(graphit) met $(met.opt) --noise $(options) & \
 	wait ; \
 	mkdir -p $* ;\
 	mv *.png $* ;\
