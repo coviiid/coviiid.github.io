@@ -59,6 +59,14 @@ radar:
 	$(graphit) met --full & \
 	wait
 
+met:
+	./graphit.py \
+		--style fast \
+		--week --round --noise \
+		--zoom 350 \
+		--proj-val --proj 7 \
+		met
+
 help.fr:
 	curl -sL https://github.com/ofa-/graphit/blob/master/help.fr.md \
 	| sed '/<article/ s:>:\n:' \
@@ -126,7 +134,7 @@ toll:
 	./waves-toll.py
 
 
-insee.%: release = 2022-03-25
+insee.%: release = 2022-04-29
 
 insee.diff: prev_rel = $(shell ls | grep insee_dc.20 | sort -r | sed -n 2p)
 insee.diff:
