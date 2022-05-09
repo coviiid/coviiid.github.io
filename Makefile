@@ -83,7 +83,7 @@ figs.s01: options = --episode-1
 figs.s02: options =
 figs.full: options = --full
 
-figs.fig: met.opt = --zoom 350 --proj-val
+figs.fig figs.s02: met.opt = --zoom 350 --proj-val
 
 figs.%:
 	for dept in `seq 95 | grep -v 20 | sed '/^.$$/ s/^/0/'` \
