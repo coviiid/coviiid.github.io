@@ -82,7 +82,7 @@ figs.fig: options = --two-months
 figs.s01: options = --episode-1
 figs.s02: options =
 
-figs.fig figs.s02: met.opt = --zoom 350 --proj-val
+met.opt = --zoom 220 --proj-val
 
 figs.%:
 	for dept in `seq 95 | grep -v 20 | sed '/^.$$/ s/^/0/'` \
