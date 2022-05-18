@@ -81,7 +81,6 @@ figures: $(figures:%=figs.%)
 figs.fig: options = --two-months
 figs.s01: options = --episode-1
 figs.s02: options =
-figs.full: options = --full
 
 figs.fig figs.s02: met.opt = --zoom 350 --proj-val
 
