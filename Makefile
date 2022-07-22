@@ -99,7 +99,7 @@ figs.%:
 figures: met-full
 
 %-full:
-	$(graphit) $* --full
+	$(graphit) $* --full --noise
 	mv  $@.png full/
 	git add -f full/$@.png
 
