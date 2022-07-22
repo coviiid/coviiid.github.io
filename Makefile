@@ -89,6 +89,7 @@ figs.%:
 			pc gc idf 2A 2B ; \
 	do \
 		$(graphit) $$dept --noise $(options) & \
+		i=$$((i+1)); [ $$((i % 10)) = 0 ] && wait ;\
 	done; \
 	$(graphit) met $(met.opt) --noise $(options) & \
 	wait ; \
