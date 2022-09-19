@@ -105,6 +105,9 @@ def main():
         else:
             plot_bars(plot, sums.incid_dc, alpha=.04, color="orange", zorder=-1)
 
+        if opt.réa:
+            sums.incid_rea.plot(marker=".", ms=3, ls="", alpha=.1, color="blue")
+
         if opt.week:
             plot_weekly_avg(sums.incid_dc, alpha=.5, color="#D0D", zorder=-1)
 
@@ -125,7 +128,10 @@ def main():
 
 
 def add_yaxis_note(plot, data, color):
-    x = pd.Timestamp(plot.axes.get_xlim()[1], unit="D")
+    import matplotlib.dates as mdates
+    x = min(plot.axes.get_xlim()[1], mdates.date2num(data.index[-1]))
+
+    x = pd.Timestamp(x, unit="D")
     y = data[str(x.date())]
     point = [x, y]
     text = round(y)
@@ -247,7 +253,8 @@ def reg_rea(data):
                 [811,825],
                 [826,846],
                 [847,854],
-                [857,
+                [857,896],
+                [902,
                 len(data)],
             ]
 
@@ -699,6 +706,8 @@ def parse_args():
             help="show rounded values graphs")
     parser.add_argument("--week", action="store_true",
             help="show weekly average graph")
+    parser.add_argument("--réa", action="store_true",
+            help="show réa raw values")
     parser.add_argument("--hills", action="store_true",
             help="show dc as hills instead of bars")
     parser.add_argument("--log-scale", action="store_true",
