@@ -63,8 +63,8 @@ met:
 	./graphit.py \
 		--style fast \
 		--week --round --noise \
-		--zoom 220 \
-		--proj-val --proj 7 \
+		--zoom 150 \
+		--proj-val --proj $$((12 - `date +%u`)) \
 		met
 
 help.fr:
@@ -138,7 +138,7 @@ death-rate:
 		jq '.[] | ."nb morts" / ."nb jours"' |\
 	        awk '{printf("%.0f\n", $$1)}'
 
-insee.%: release = 2022-09-30
+insee.%: release = 2022-10-28
 
 insee.diff: prev_rel = $(shell ls | grep insee_dc.20 | sort -r | sed -n 2p)
 insee.diff:
