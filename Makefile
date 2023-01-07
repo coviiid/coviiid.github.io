@@ -108,10 +108,14 @@ fetch:
 	./fetch.sh
 
 wait-for-data.csv:
-	while [ `tail -1 data.csv | cut -d ';' -f2` != `date +%F` ]; do \
-		sleep 1m	;\
+	@(\
+	today=`date +%F`	;\
+	last_data() { tail -1 data.csv | cut -d ';' -f2; } ;\
+	while [ "`last_data`" != $$today ]; do \
 		./fetch.sh	;\
-	done
+		printf "."	;\
+		sleep 1m	;\
+	done ) 2>/dev/null
 
 push:
 	git config user.name coviiid
@@ -138,7 +142,7 @@ death-rate:
 		jq '.[] | ."nb morts" / ."nb jours"' |\
 	        awk '{printf("%.0f\n", $$1)}'
 
-insee.%: release = 2022-11-25
+insee.%: release = 2023-01-06
 
 insee.diff: prev_rel = $(shell ls | grep insee_dc.20 | sort -r | sed -n 2p)
 insee.diff:
