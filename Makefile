@@ -78,9 +78,13 @@ help.fr:
 figures = fig s02
 figures: $(figures:%=figs.%)
 
-figs.fig: options = --two-months
+proj.gap = $(shell echo $$((12 - `date +%u`)))
+proj.opt = --proj $(proj.gap)
+
+
+figs.fig: options = --two-months  $(proj.opt)
 figs.s01: options = --episode-1
-figs.s02: options =
+figs.s02: options =               $(proj.opt)
 
 met.opt = --zoom 220 --proj-val
 
