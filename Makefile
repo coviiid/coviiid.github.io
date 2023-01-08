@@ -86,15 +86,21 @@ figs.fig: options = --two-months  $(proj.opt)
 figs.s01: options = --episode-1
 figs.s02: options =               $(proj.opt)
 
+dep.opt = --zoom 15
+pgc.opt = --zoom 29
+idf.opt = --zoom 60
 met.opt = --zoom 220 --proj-val
 
 figs.%:
 	for dept in `seq 95 | grep -v 20 | sed '/^.$$/ s/^/0/'` \
-			pc gc idf 2A 2B ; \
+			2A 2B ; \
 	do \
-		$(graphit) $$dept --noise $(options) & \
+		$(graphit) $$dept $(dep.opt) --noise $(options) & \
 		i=$$((i+1)); [ $$((i % 10)) = 0 ] && wait ;\
 	done; \
+	$(graphit) pc  $(pgc.opt) --noise $(options) & \
+	$(graphit) gc  $(pgc.opt) --noise $(options) & \
+	$(graphit) idf $(idf.opt) --noise $(options) & \
 	$(graphit) met $(met.opt) --noise $(options) & \
 	wait ; \
 	mkdir -p $* ;\
