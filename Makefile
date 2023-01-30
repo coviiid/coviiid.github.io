@@ -121,9 +121,10 @@ wait-for-data.csv:
 	@(\
 	today=`date +%F`	;\
 	last_data() { tail -1 data.csv | cut -d ';' -f2; } ;\
-	while [ "`last_data`" != $$today ]; do \
+	while true; do \
 		./fetch.sh	;\
 		printf "."	;\
+		if [ "`last_data`" = $$today ]; then break; fi;\
 		sleep 1m	;\
 	done ) 2>/dev/null
 
@@ -152,7 +153,7 @@ death-rate:
 		jq '.[] | ."nb morts" / ."nb jours"' |\
 	        awk '{printf("%.0f\n", $$1)}'
 
-insee.%: release = 2023-01-06
+insee.%: release = 2023-01-27
 
 insee.diff: prev_rel = $(shell ls | grep insee_dc.20 | sort -r | sed -n 2p)
 insee.diff:
@@ -168,8 +169,6 @@ insee.fetch:
 	cd insee_dc.$(release); 7z x ../$(zip_file)
 	rm -f $(zip_file)
 	ln -sfT insee_dc.$(release) insee_dc
-	[ -f insee_dc/DC_20212022_det.csv ] && \
-		mv insee_dc/DC_20212022_det.csv insee_dc/DC_2021_det.csv
 
 insee.url = https://www.insee.fr/fr/statistiques/fichier/4487988
 
