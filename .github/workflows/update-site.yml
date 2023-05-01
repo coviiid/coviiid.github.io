@@ -4,8 +4,8 @@ on:
   push:
     tags:
       - '*'
-  schedule:
-      - cron: "0 16 * * mon-fri"
+#  schedule:
+#      - cron: "0 16 * * mon-fri"
 
 jobs:
   publish-site:
